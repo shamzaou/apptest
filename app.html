@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Questionnaire</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: right;
+            direction: rtl;
+        }
+        .progress-container {
+            width: 100%;
+            background-color: #f0f0f0;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .progress-bar {
+            height: 20px;
+            background-color: #4CAF50;
+            border-radius: 5px;
+            width: 0%;
+            transition: width 0.3s ease;
+            text-align: center;
+            color: white;
+            line-height: 20px;
+            font-size: 12px;
+        }
+        .question-container {
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+            text-align: right;
+        }
+        .active {
+            display: block;
+        }
+        .explanation {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-right: 3px solid #4CAF50;
+            border-left: none;
+            text-align: right;
+        }
+        .buttons {
+            display: flex;
+            justify-content: flex-start;
+            flex-direction: row-reverse;
+            margin-top: 20px;
+            gap: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .results {
+            display: none;
+            text-align: right;
+        }
+        h1, h2, p, ul {
+            text-align: right;
+        }
+        .left-aligned-button {
+            display: block;
+            margin-right: auto;
+            margin-left: 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>استبيان مؤشرات الطاقة السلبية</h1>
+    
+    <div class="progress-container">
+        <div class="progress-bar" id="progress">0%</div>
+    </div>
+    
+    <div id="questionnaire">
+        <div class="question-container active" id="q1">
+            <h2>السؤال 1</h2>
+            <p>هل تشعر بالهوس؟</p>
+            <!-- <div class="explanation">
+                Regular exercise helps maintain physical and mental health, reducing the risk of various diseases.
+            </div> -->
+            <div class="buttons">
+                <button onclick="answerQuestion(1, true)">نعم</button>
+                <button onclick="answerQuestion(1, false)">لا</button>
+            </div>
+        </div>
+        
+        <div class="question-container" id="q2">
+            <h2>السؤال 2</h2>
+            <p>هل تعاني من ألشعور بالتشتت و الملل؟</p>
+            <!-- <div class="explanation">
+                A balanced diet rich in fruits and vegetables provides essential vitamins and nutrients for optimal health.
+            </div> -->
+            <div class="buttons">
+                <button onclick="answerQuestion(2, true)">نعم</button>
+                <button onclick="answerQuestion(2, false)">لا</button>
+            </div>
+        </div>
+        
+        <div class="question-container" id="q3">
+            <h2>السؤال 3</h2>
+            <p>هل تعاني من ضعف الأداء؟</p>
+            <!-- <div class="explanation">
+                Adequate sleep is crucial for cognitive function, immune health, and overall wellbeing.
+            </div> -->
+            <div class="buttons">
+                <button onclick="answerQuestion(3, true)">نعم</button>
+                <button onclick="answerQuestion(3, false)">لا</button>
+            </div>
+        </div>
+        
+        <div class="question-container" id="q4">
+            <h2>السؤال 4</h2>
+            <p>هل تجد صعوبة في الإعتراف بالخطأ؟</p>
+            <!-- <div class="explanation">
+                Mindfulness and meditation can reduce stress, improve focus, and enhance emotional wellbeing.
+            </div> -->
+            <div class="buttons">
+                <button onclick="answerQuestion(4, true)">نعم</button>
+                <button onclick="answerQuestion(4, false)">لا</button>
+            </div>
+        </div>
+        
+        <div class="question-container" id="q5">
+            <h2>السؤال 5</h2>
+            <p>هل لديك إفراط في الثقة بالنفس؟</p>
+            <!-- <div class="explanation">
+                Reducing screen time before bed improves sleep quality by limiting exposure to blue light.
+            </div> -->
+            <div class="buttons">
+                <button onclick="answerQuestion(5, true)">نعم</button>
+                <button onclick="answerQuestion(5, false)">لا</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="results" id="results">
+        <h2>النتائج</h2>
+        <p>بناءً على إجاباتك، إليك تحليل الأعراض :</p>
+        <ul id="positive-habits">
+            <!-- Results will be inserted here -->
+        </ul>
+        <button onclick="resetQuestionnaire()">إبدأ من جديد</button>
+    </div>
+
+    <script>
+        const totalQuestions = 5;
+        let currentQuestion = 1;
+        const answers = {};
+        
+        // Add titles for each question
+        const questionTitles = {
+            1: "الهوس:",
+            2: "شعور بالتشتت والملل:",
+            3: "ضعف الأداء:",
+            4: "صعوبة الاعتراف بالخطأ:",
+            5: "الإفراط في الثقة بالنفس:"
+        };
+        
+        const explanations = {
+            1: [
+                "طبيا: قد يكون اضطراب ثنائي القطب (Bipolar Disorder) أو فرط نشاط الغدة الدرقية. يوصى بفحص T4 ،T3 ، TSH.",
+                "نفسيا: يدل على نوبة هوس في اضطرابات المزاج. يوصى باختبار MDQ (Mood Disorder Questionnaire).",
+                "روحيا: قد يكون ناتجا عن طاقة مفرطة غير متوازنة تؤثر على العواطف والمزاج.",
+                "ميتافيزيقيا: اضطراب في شاكرة التاج يؤدي إلى اندفاع غير متحكم به"
+            ],
+            2: [
+                "طبيا: نقص فيتامين B12، فيتامين D الحديد قد يؤدي إلى ضعف التركيز.",
+                "نفسيا: قد يكون مؤشرًا على اضطراب نقص الانتباه وفرط النشاط (ADHD). يوصى باختبار ASRS.",
+                "روحيا: قد يكون نتيجة تأثير سلبي من بيئة غير محفزة للطاقة الإبداعية.",
+                "ميتافيزيقيا: اضطراب في شاكرة العين الثالثة يسبب عدم التركيز والتشتت الذهني."
+            ],
+            3: [
+                "طبيا: فقر الدم أو انخفاض هرمونات الغدة الدرقية. يوصى بفحص TSH CBC.",
+                "نفسيا: الاكتئاب والقلق قد يؤثران على الأداء. يوصى باختبار BDI.",
+                "روحيا: نقص تدفق الطاقة الداخلية بسبب التعرض لضغط نفسي وروحي سلبي.",
+                "ميتافيزيقيا: ضعف شاكرة الجذر يؤدي إلى شعور بعدم الاستقرار والضعف العام."
+            ],
+            4: [
+                "طبيا: قد يكون مرتبطا بخلل في الفص الجبهي المسؤول عن اتخاذ القرار.",
+                "نفسيا: مرتبط باضطراب الشخصية النرجسية. يوصى باختبار NPI",
+                "روحيا: قد يكون بسبب تراكم طاقة سلبية نتيجة عناد داخلي.",
+                "ميتافيزيقيا: فرط نشاط شاكرة الضفيرة الشمسية يؤدي إلى رفض النقد."
+            ],
+            5: [
+                " طبيا: قد يكون مرتبطا بنشاط زائد في الدوبامين.",
+                "نفسيا: اضطراب الشخصية النرجسية أو نوبات الهوس.",
+                "روحيا: تدفق طاقي غير متوازن يؤدي إلى إحساس زائد بالقوة.",
+                "ميتافيزيقيا: اختلال في شاكرة القلب والضفيرة الشمسية يجعل الشخص يشعر بالقوة المطلقة.",
+            ]
+        };
+        
+        function updateProgress() {
+            const progress = Math.round((currentQuestion - 1) / totalQuestions * 100);
+            document.getElementById("progress").style.width = progress + "%";
+            document.getElementById("progress").textContent = progress + "%";
+        }
+        
+        function answerQuestion(questionNum, answer) {
+            // Save the answer
+            answers[questionNum] = answer;
+            
+            // Hide current question
+            document.getElementById(`q${questionNum}`).classList.remove('active');
+            
+            // If we've answered all questions, show results
+            if (questionNum === totalQuestions) {
+                // Update to 100% before showing results
+                document.getElementById("progress").style.width = "100%";
+                document.getElementById("progress").textContent = "100%";
+                showResults();
+            } else {
+                // Otherwise show next question
+                currentQuestion++;
+                document.getElementById(`q${currentQuestion}`).classList.add('active');
+                updateProgress();
+            }
+        }
+        
+        function showResults() {            
+            // Hide questionnaire
+            document.getElementById('questionnaire').style.display = 'none';
+            
+            // Show results
+            document.getElementById('results').style.display = 'block';
+            
+            // Populate positive habits
+            const positiveHabitsList = document.getElementById('positive-habits');
+            positiveHabitsList.innerHTML = '';
+            
+            let hasPositiveHabits = false;
+            
+            for (let i = 1; i <= totalQuestions; i++) {
+                if (answers[i] === true) {
+                    hasPositiveHabits = true;
+                    const listItem = document.createElement('li');
+                    
+                    // Create a heading for the explanation using the title
+                    const heading = document.createElement('strong');
+                    heading.textContent = questionTitles[i];
+                    listItem.appendChild(heading);
+                    
+                    // Add a break after the heading
+                    listItem.appendChild(document.createElement('br'));
+                    
+                    // Add each explanation line as a separate paragraph
+                    const explanationList = document.createElement('ul');
+                    explanations[i].forEach(text => {
+                        const explanationItem = document.createElement('li');
+                        explanationItem.textContent = text;
+                        explanationList.appendChild(explanationItem);
+                    });
+                    
+                    listItem.appendChild(explanationList);
+                    positiveHabitsList.appendChild(listItem);
+                }
+            }
+            
+            if (!hasPositiveHabits) {
+                positiveHabitsList.innerHTML = '<li>لم يتم تحديد أي عوامل سلبية. يبدو أن طاقتك إيجابية!</li>';
+            }
+        }
+        
+        function resetQuestionnaire() {
+            // Reset state variables
+            currentQuestion = 1;
+            for (let i = 1; i <= totalQuestions; i++) {
+                answers[i] = null;
+            }
+            
+            // Hide results
+            document.getElementById('results').style.display = 'none';
+            
+            // Show questionnaire
+            document.getElementById('questionnaire').style.display = 'block';
+            
+            // Hide all questions except the first one
+            for (let i = 1; i <= totalQuestions; i++) {
+                const questionEl = document.getElementById(`q${i}`);
+                questionEl.classList.remove('active');
+                if (i === 1) {
+                    questionEl.classList.add('active');
+                }
+            }
+            
+            // Reset progress bar
+            updateProgress();
+        }
+        
+        // Initialize progress bar
+        updateProgress();
+    </script>
+</body>
+</html>
